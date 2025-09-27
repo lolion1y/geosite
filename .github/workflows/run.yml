@@ -179,6 +179,8 @@ jobs:
           echo acgrip.com >> ./community/data/geolocation-\!cn
           echo xn--ngstr-cn-8za9o.com >> ./community/data/google
 
+          echo yunxinfw.com >> ./community/data/netease
+
       - name: Build temp geosite.dat
         run: |
           cd custom || exit 1
