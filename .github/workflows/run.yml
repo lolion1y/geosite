@@ -185,7 +185,7 @@ jobs:
       - name: Build temp geosite.dat
         run: |
           cd custom || exit 1
-          go run ./ --datapath=../community/data --outputpath=./ --outputname=temp-geosite.dat
+          go run ./ --datapath=../community/data --outputpath=./ --datname=temp-geosite.dat
 
       - name: Convert geosite to metadata
         env:
