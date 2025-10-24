@@ -195,7 +195,7 @@ jobs:
           wget https://github.com/MetaCubeX/geo/releases/latest/download/geo-linux-amd64 -O geo
           chmod +x geo
           mkdir unpacksite
-          ./geo unpack site -d unpacksite ./custom/publish/geosite.dat
+          ./geo unpack site -d unpacksite ../custom/publish/geosite.dat
 
       - name: Build geosite.dat file
         env:
