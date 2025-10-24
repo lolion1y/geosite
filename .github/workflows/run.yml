@@ -142,6 +142,24 @@ jobs:
         env:
           SED: sed '/^\s*#/d' | sed 's/^PROCESS-NAME,//' | sed 's/DOMAIN,/full:/g' | sed 's/DOMAIN-SUFFIX,//g' | sed 's/DOMAIN-KEYWORD,/keyword:/g' | sed '/^\s*IP-CIDR/d'
         run: |
+          curl -sSL https://raw.githubusercontent.com/lolion1y/atri-rules/main/biliintl.list > ./community/data/biliintl
+          curl -sSL https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/OneDrive/OneDrive.list | ${{ env.SED }} > ./community/data/onedrive
+          echo "sharepoint.cn" >> ./community/data/onedrive
+          curl -sSL https://raw.githubusercontent.com/xishang0128/rules/main/sharepoint.list > ./community/data/sharepoint
+          curl -sSL https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/PrivateTracker/PrivateTracker.list |sed '/^\s*#/d' | sed 's/^PROCESS-NAME,//' | sed 's/DOMAIN,//g' | sed 's/DOMAIN-SUFFIX,//g' | sed 's/DOMAIN-KEYWORD,/keyword:/g' | sed '/^\s*IP-CIDR/d' > temp-tracker.txt
+          curl -sSL https://raw.githubusercontent.com/XIU2/TrackersListCollection/master/all.txt | grep -i "\.[A-Z]" | sed 's/^.*\/\///g' | sed 's/:.*\/.*//g' >> temp-tracker.txt
+          curl -sSL https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_all.txt | grep -i "\.[A-Z]" | sed 's/^.*\/\///g' | sed 's/:.*\/.*//g' >> temp-tracker.txt
+          cat temp-tracker.txt | sort | uniq > ./community/data/tracker
+          curl -sSL https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/BlockHttpDNS/BlockHttpDNS.list | ${{ env.SED }} > ./community/data/httpdns
+          echo "zed.dev" >> ./community/data/category-dev
+
+          echo ipleak.net >> ./community/data/geolocation-\!cn
+          echo browserleaks.org >> ./community/data/geolocation-\!cn
+          echo acgrip.com >> ./community/data/geolocation-\!cn
+          echo xn--ngstr-cn-8za9o.com >> ./community/data/google
+
+          echo yunxinfw.com >> ./community/data/netease
+
           echo "auvpn.net" >> ./community/data/category-vpnservices
           echo "ausososo.click @cn" >> ./community/data/category-vpnservices
           echo "ausososo.club @cn" >> ./community/data/category-vpnservices
@@ -164,23 +182,6 @@ jobs:
           echo "include:geolocation-!cn@cn" >> ./community/data/cn
           echo "include:geolocation-cn@!cn" >> ./community/data/geolocation-\!cn
 
-          curl -sSL https://raw.githubusercontent.com/lolion1y/atri-rules/main/biliintl.list > ./community/data/biliintl
-          curl -sSL https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/OneDrive/OneDrive.list | ${{ env.SED }} > ./community/data/onedrive
-          echo "sharepoint.cn" >> ./community/data/onedrive
-          curl -sSL https://raw.githubusercontent.com/xishang0128/rules/main/sharepoint.list > ./community/data/sharepoint
-          curl -sSL https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/PrivateTracker/PrivateTracker.list |sed '/^\s*#/d' | sed 's/^PROCESS-NAME,//' | sed 's/DOMAIN,//g' | sed 's/DOMAIN-SUFFIX,//g' | sed 's/DOMAIN-KEYWORD,/keyword:/g' | sed '/^\s*IP-CIDR/d' > temp-tracker.txt
-          curl -sSL https://raw.githubusercontent.com/XIU2/TrackersListCollection/master/all.txt | grep -i "\.[A-Z]" | sed 's/^.*\/\///g' | sed 's/:.*\/.*//g' >> temp-tracker.txt
-          curl -sSL https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_all.txt | grep -i "\.[A-Z]" | sed 's/^.*\/\///g' | sed 's/:.*\/.*//g' >> temp-tracker.txt
-          cat temp-tracker.txt | sort | uniq > ./community/data/tracker
-          # curl -sSL https://github.com/blackmatrix7/ios_rule_script/raw/master/rule/Clash/BlockHttpDNS/BlockHttpDNS.list | ${{ env.SED }} > ./community/data/httpdns
-
-          echo ipleak.net >> ./community/data/geolocation-\!cn
-          echo browserleaks.org >> ./community/data/geolocation-\!cn
-          echo acgrip.com >> ./community/data/geolocation-\!cn
-          echo xn--ngstr-cn-8za9o.com >> ./community/data/google
-
-          echo yunxinfw.com >> ./community/data/netease
-
       - name: Build temp geosite.dat
         run: |
           cd custom || exit 1
@@ -190,31 +191,28 @@ jobs:
         env:
           NO_SKIP: true
         run: |
-          mkdir -p ./community/tmp
-          cp ./custom/publish/geosite.dat ./community/tmp
-          cd ./community/tmp
+          cd community || exit 1
           wget https://github.com/MetaCubeX/geo/releases/latest/download/geo-linux-amd64 -O geo
           chmod +x geo
-          mkdir geosite
-          ./geo unpack site -d geosite geosite.dat
-          rm geo
+          mkdir unpacksite
+          ./geo unpack site -d unpacksite ./custom/publish/geosite.dat
 
       - name: Build geosite.dat file
         env:
           NO_SKIP: true
         run: |
           cd community || exit 1
-          mkdir -p geo-data
+          mkdir -p metadata
           code=(apple bilibili biliintl cn ehentai geolocation-\!cn github googlefcm google line microsoft misskey netease onedrive pixiv private sharepoint steam telegram twitter win-update youtube)
           for((i=0;i<${#code[@]};i++));do
-            cp ./tmp/geosite/${code[i]} ./geo-data/${code[i]}
+            cp ./unpacksite/${code[i]} ./metadata/${code[i]}
             sed -i 's/regex:/regexp:/g; s/plain:/keyword:/g' ./geo-data/${code[i]}
           done
-          go run ./ --datapath=./geo-data --outputname geosite.dat
+          go run ./ --datapath=./metadata --outputname geosite.dat
 
-      - name: Move and zip files
+      - name: Move files
         run: |
-          mkdir -p ./publish/
+          mkdir -p ./publish
           install -Dp ./community/geosite.dat ./publish/
 
       - name: Delete current release assets
