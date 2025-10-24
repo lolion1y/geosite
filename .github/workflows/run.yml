@@ -185,7 +185,7 @@ jobs:
       - name: Build temp geosite.dat
         run: |
           cd custom || exit 1
-          go run ./ --datapath=../community/data
+          go run ./ --datapath=../community/data --outputpath=./ --outputname=temp-geosite.dat
 
       - name: Convert geosite to metadata
         env:
@@ -195,7 +195,7 @@ jobs:
           wget https://github.com/MetaCubeX/geo/releases/latest/download/geo-linux-amd64 -O geo
           chmod +x geo
           mkdir unpacksite
-          ./geo unpack site -d unpacksite ../custom/publish/geosite.dat
+          ./geo unpack site -d unpacksite ../custom/temp-geosite.dat
 
       - name: Build geosite.dat file
         env:
@@ -206,13 +206,13 @@ jobs:
           code=(apple bilibili biliintl cn ehentai geolocation-\!cn github googlefcm google line microsoft misskey netease onedrive pixiv private sharepoint steam telegram twitter win-update youtube)
           for((i=0;i<${#code[@]};i++));do
             cp ./unpacksite/${code[i]} ./metadata/${code[i]}
-            sed -i 's/regex:/regexp:/g; s/plain:/keyword:/g' ./geo-data/${code[i]}
+            sed -i 's/regex:/regexp:/g; s/plain:/keyword:/g' ./metadata/${code[i]}
           done
-          go run ./ --datapath=./metadata --outputname geosite.dat
+          go run ./ --datapath=./metadata --outputname=geosite.dat
 
       - name: Move files
         run: |
-          mkdir -p ./publish
+          mkdir -p ./publish/
           install -Dp ./community/geosite.dat ./publish/
 
       - name: Delete current release assets
