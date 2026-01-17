@@ -182,6 +182,8 @@ jobs:
           echo "include:geolocation-!cn@cn" >> ./community/data/cn
           echo "include:geolocation-cn@!cn" >> ./community/data/geolocation-\!cn
 
+          cat ./community/data/cn
+
       - name: Build temp geosite.dat
         run: |
           cd custom || exit 1
@@ -209,6 +211,8 @@ jobs:
             sed -i 's/regex:/regexp:/g; s/plain:/keyword:/g' ./metadata/${code[i]}
           done
           go run ./ --datapath=./metadata --outputname=geosite.dat
+
+          cat ./metadata/cn
 
       - name: Move files
         run: |
