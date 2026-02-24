@@ -159,6 +159,8 @@ jobs:
           echo ipleak.net >> ./community/data/geolocation-\!cn
           echo browserleaks.org >> ./community/data/geolocation-\!cn
           echo acgrip.com >> ./community/data/geolocation-\!cn
+          echo global.market.xiaomi.com >> ./community/data/geolocation-\!cn
+          echo c.mi.com >> ./community/data/geolocation-\!cn
           echo xn--ngstr-cn-8za9o.com >> ./community/data/google
 
           echo yunxinfw.com >> ./community/data/netease
