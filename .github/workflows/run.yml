@@ -204,6 +204,12 @@ jobs:
           mkdir unpacksite
           ./geo unpack site -d unpacksite ../custom/temp-geosite.dat
 
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: community/go.mod
+          cache-dependency-path: community/go.sum
+
       - name: Build geosite.dat file
         env:
           NO_SKIP: true
