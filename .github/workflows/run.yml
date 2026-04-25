@@ -53,11 +53,11 @@ jobs:
           go-version-file: ./custom/go.mod
           cache-dependency-path: ./custom/go.sum
 
-     # - name: Generate GFWList domains
-       # run: |
-         # cd gfwlist2dnsmasq || exit 1
-         # chmod +x ./gfwlist2dnsmasq.sh
-         # ./gfwlist2dnsmasq.sh -l -o ./temp-gfwlist.txt
+      # - name: Generate GFWList domains
+        # run: |
+          # cd gfwlist2dnsmasq || exit 1
+          # chmod +x ./gfwlist2dnsmasq.sh
+          # ./gfwlist2dnsmasq.sh -l -o ./temp-gfwlist.txt
 
       - name: Get and add direct domains into temp-direct.txt file
         run: |
@@ -67,16 +67,16 @@ jobs:
 
       - name: Get and add proxy domains into temp-proxy.txt file
         run: |
-         # cat ./gfwlist2dnsmasq/temp-gfwlist.txt | perl -ne '/^((?=^.{3,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})+)/ && print "$1\n"' > temp-proxy.txt
-         # curl -sSL $GOOGLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' >> temp-proxy.txt
-         # curl -sSL $APPLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' >> temp-proxy.txt
-         # curl -sSL ${CUSTOM_PROXY} | grep -Ev ":@cn" | perl -ne '/^(domain):([^:]+)(\n$|:@.+)/ && print "$2\n"' >> temp-proxy.txt
+          # cat ./gfwlist2dnsmasq/temp-gfwlist.txt | perl -ne '/^((?=^.{3,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})+)/ && print "$1\n"' > temp-proxy.txt
+          # curl -sSL $GOOGLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' >> temp-proxy.txt
+          # curl -sSL $APPLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' >> temp-proxy.txt
+          # curl -sSL ${CUSTOM_PROXY} | grep -Ev ":@cn" | perl -ne '/^(domain):([^:]+)(\n$|:@.+)/ && print "$2\n"' >> temp-proxy.txt
           cp ./community/data/geolocation-\!cn temp-proxy.txt
 
-     # - name: Reserve `full`, `regexp` and `keyword` type of rules from custom lists to "reserve" files
-       # run: |
-         # curl -sSL ${CUSTOM_DIRECT} | grep -v google | grep -v manhua | grep -v ooklaserver | grep -v "acg.rip" | perl -ne '/^((full|regexp|keyword):[^:]+)(\n$|:@.+)/ && print "$1\n"' | sort --ignore-case -u > direct-reserve.txt
-         # curl -sSL ${CUSTOM_PROXY} | grep -Ev ":@cn" | perl -ne '/^((full|regexp|keyword):[^:]+)(\n$|:@.+)/ && print "$1\n"' | sort --ignore-case -u > proxy-reserve.txt
+      # - name: Reserve `full`, `regexp` and `keyword` type of rules from custom lists to "reserve" files
+        # run: |
+          # curl -sSL ${CUSTOM_DIRECT} | grep -v google | grep -v manhua | grep -v ooklaserver | grep -v "acg.rip" | perl -ne '/^((full|regexp|keyword):[^:]+)(\n$|:@.+)/ && print "$1\n"' | sort --ignore-case -u > direct-reserve.txt
+          # curl -sSL ${CUSTOM_PROXY} | grep -Ev ":@cn" | perl -ne '/^((full|regexp|keyword):[^:]+)(\n$|:@.+)/ && print "$1\n"' | sort --ignore-case -u > proxy-reserve.txt
 
       - name: Add proxy, direct and reject domains from "hidden" branch to appropriate temp files
         run: |
@@ -107,6 +107,9 @@ jobs:
           python ./resouces/removeFrom.py -remove ./resouces/direct-need-to-remove.txt -from ./direct-list-without-redundant -out ./temp-cn.txt
           python ./resouces/removeFrom.py -remove ./resouces/proxy-need-to-remove.txt -from ./proxy-list-without-redundant -out ./temp-geolocation-\!cn.txt
 
+          cat temp-cn.txt
+          cat temp-geolocation-\!cn.txt
+
       - name: Write lists to data directory
         run: |
           cat temp-cn.txt | sort --ignore-case -u > ./community/data/cn
@@ -114,12 +117,12 @@ jobs:
           cat temp-geolocation-\!cn.txt | sort --ignore-case -u > ./community/data/geolocation-\!cn
           # cat temp-geolocation-\!cn.txt | sort --ignore-case -u | perl -ne 'print if not /^((?=^.{3,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})+)/' > proxy-tld-list.txt
 
-     # - name: Add `full`, `regexp` and `keyword` type of rules back into "cn", and "geolocation-!cn" list
-       # run: |
-         # [ -f "direct-reserve.txt" ] && cat direct-reserve.txt >> ./community/data/cn
-         # [ -f "proxy-reserve.txt" ] && cat proxy-reserve.txt >> ./community/data/geolocation-\!cn
-         # cp ./community/data/cn direct-list.txt
-         # cp ./community/data/geolocation-\!cn proxy-list.txt
+      # - name: Add `full`, `regexp` and `keyword` type of rules back into "cn", and "geolocation-!cn" list
+        # run: |
+          # [ -f "direct-reserve.txt" ] && cat direct-reserve.txt >> ./community/data/cn
+          # [ -f "proxy-reserve.txt" ] && cat proxy-reserve.txt >> ./community/data/geolocation-\!cn
+          # cp ./community/data/cn direct-list.txt
+          # cp ./community/data/geolocation-\!cn proxy-list.txt
 
       - name: Create `win-spy` `win-update` `win-extra` lists
         run: |
@@ -184,19 +187,19 @@ jobs:
           echo "full:api.inforun.work @cn" >> ./community/data/category-vpnservices
           echo "full:repo.t5.work @cn" >> ./community/data/category-vpnservices
           echo "splashtop.com @cn" >> ./community/data/category-vpnservices
-          echo "include:geolocation-!cn@cn" >> ./community/data/cn
-          echo "include:geolocation-cn@!cn" >> ./community/data/geolocation-\!cn
+          echo "include:geolocation-!cn @cn" >> ./community/data/cn
+          echo "include:geolocation-cn @!cn" >> ./community/data/geolocation-\!cn
 
           cat ./community/data/cn
 
       - name: Build temp geosite.dat
         run: |
           cd custom || exit 1
-          go run ./ --datapath=../community/data --outputpath=./ --datname=temp-geosite.dat
+          go run ./ --datapath=../community/data --outputpath=./ --excludeattrs= --togfwlist= --exportlists=cn --datname=temp-geosite.dat
+
+          cat cn.txt
 
       - name: Convert geosite to metadata
-        env:
-          NO_SKIP: true
         run: |
           cd community || exit 1
           wget https://github.com/MetaCubeX/geo/releases/latest/download/geo-linux-amd64 -O geo
@@ -211,8 +214,6 @@ jobs:
           cache-dependency-path: community/go.sum
 
       - name: Build geosite.dat file
-        env:
-          NO_SKIP: true
         run: |
           cd community || exit 1
           mkdir -p metadata
