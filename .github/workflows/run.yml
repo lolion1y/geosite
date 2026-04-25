@@ -63,7 +63,7 @@ jobs:
         run: |
           # curl -sSL ${CHINA_DOMAINS_URL} | sed '/^\s*#/d' | sed '/^[^\.]/ s/^/full:/' |  sed 's/^\.\([^.]*\)/\1/' > temp-direct.txt
           # curl -sSL ${CUSTOM_DIRECT} | perl -ne '/^(domain):([^:]+)(\n$|:@.+)/ && print "$2\n"' >> temp-direct.txt
-          cat ./community/data/cn | tee >> temp-direct.txt
+          cat ./community/data/cn | tee -a temp-direct.txt
 
       - name: Get and add proxy domains into temp-proxy.txt file
         run: |
@@ -71,7 +71,7 @@ jobs:
           # curl -sSL $GOOGLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' >> temp-proxy.txt
           # curl -sSL $APPLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' >> temp-proxy.txt
           # curl -sSL ${CUSTOM_PROXY} | grep -Ev ":@cn" | perl -ne '/^(domain):([^:]+)(\n$|:@.+)/ && print "$2\n"' >> temp-proxy.txt
-          cat ./community/data/geolocation-\!cn | tee >> temp-proxy.txt
+          cat ./community/data/geolocation-\!cn | tee -a temp-proxy.txt
 
       # - name: Reserve `full`, `regexp` and `keyword` type of rules from custom lists to "reserve" files
         # run: |
@@ -80,14 +80,14 @@ jobs:
 
       - name: Add proxy, direct and reject domains from "hidden" branch to appropriate temp files
         run: |
-          cat ./resouces/proxy.txt | tee >> temp-proxy.txt
-          cat ./resouces/direct.txt | tee >> temp-direct.txt
+          cat ./resouces/proxy.txt | tee -a temp-proxy.txt
+          cat ./resouces/direct.txt | tee -a temp-direct.txt
           # cat reject.txt >> temp-reject.txt
 
       - name: Sort and generate redundant lists
         run: |
-          cat temp-proxy.txt | sort --ignore-case -u | tee > proxy-list-with-redundant
-          cat temp-direct.txt | sort --ignore-case -u | tee > direct-list-with-redundant
+          cat temp-proxy.txt | sort --ignore-case -u | tee proxy-list-with-redundant
+          cat temp-direct.txt | sort --ignore-case -u | tee direct-list-with-redundant
           # cat temp-reject.txt | sort --ignore-case -u > reject-list-with-redundant
 
       - name: Remove redundant domains
@@ -114,8 +114,8 @@ jobs:
           # cat temp-geolocation-\!cn.txt | sort --ignore-case -u | perl -ne '/^((?=^.{1,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})*)/ && print "$1\n"' | perl -ne 'print if not /\.cn$/' > ./community/data/geolocation-\!cn
           # cat temp-geolocation-\!cn.txt | sort --ignore-case -u | perl -ne 'print if not /^((?=^.{3,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})+)/' > proxy-tld-list.txt
 
-          cat temp-cn.txt | sort --ignore-case -u | tee > ./community/data/cn
-          cat temp-geolocation-\!cn.txt | sort --ignore-case -u | tee > ./community/data/geolocation-\!cn
+          cat temp-cn.txt | sort --ignore-case -u | tee ./community/data/cn
+          cat temp-geolocation-\!cn.txt | sort --ignore-case -u | tee ./community/data/geolocation-\!cn
 
       # - name: Add `full`, `regexp` and `keyword` type of rules back into "cn", and "geolocation-!cn" list
         # run: |
@@ -129,9 +129,9 @@ jobs:
           # curl -sSL $GOOGLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "full:$1\n"' > ./community/data/google-cn
           # curl -sSL $APPLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "full:$1\n"' > ./community/data/apple-cn
           # cat ./gfwlist2dnsmasq/temp-gfwlist.txt | perl -ne '/^((?=^.{3,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})+)/ && print "$1\n"' >> ./community/data/gfw
-          curl -sSL $WIN_SPY | grep "0.0.0.0" | awk '{print $2}' | tee > ./community/data/win-spy
-          curl -sSL $WIN_UPDATE | grep "0.0.0.0" | awk '{print $2}' | tee > ./community/data/win-update
-          curl -sSL $WIN_EXTRA | grep "0.0.0.0" | awk '{print $2}' | tee > ./community/data/win-extra
+          curl -sSL $WIN_SPY | grep "0.0.0.0" | awk '{print $2}' > ./community/data/win-spy
+          curl -sSL $WIN_UPDATE | grep "0.0.0.0" | awk '{print $2}' > ./community/data/win-update
+          curl -sSL $WIN_EXTRA | grep "0.0.0.0" | awk '{print $2}' > ./community/data/win-extra
 
       - name: merge 'ios_rule_script/SteamCN'
         env:
