@@ -188,7 +188,7 @@ jobs:
           echo "full:repo.t5.work @cn" >> ./community/data/category-vpnservices
           echo "splashtop.com @cn" >> ./community/data/category-vpnservices
           echo "include:geolocation-!cn @cn" >> ./community/data/cn
-          echo "include:geolocation-cn @!cn" >> ./community/data/geolocation-\!cn
+          # echo "include:geolocation-cn @!cn" >> ./community/data/geolocation-\!cn
 
           cat ./community/data/cn
 
