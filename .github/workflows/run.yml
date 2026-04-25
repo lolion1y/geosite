@@ -88,8 +88,8 @@ jobs:
 
       - name: Add proxy, direct and reject domains from "hidden" branch to appropriate temp files
         run: |
-          cat ./resouces/proxy.txt >> temp-proxy.txt
-          cat ./resouces/direct.txt >> temp-direct.txt
+          cat ./resources/proxy.txt >> temp-proxy.txt
+          cat ./resources/direct.txt >> temp-direct.txt
           # cat reject.txt >> temp-reject.txt
 
           echo "::group::temp-direct.txt"
@@ -116,20 +116,20 @@ jobs:
 
       - name: Remove redundant domains
         run: |
-          chmod +x ./resouces/*.py
-          python ./resouces/findRedundantDomain.py ./direct-list-with-redundant ./direct-list-deleted-unsort
-          python ./resouces/findRedundantDomain.py ./proxy-list-with-redundant ./proxy-list-deleted-unsort
+          chmod +x ./resources/*.py
+          python ./resources/findRedundantDomain.py ./direct-list-with-redundant ./direct-list-deleted-unsort
+          python ./resources/findRedundantDomain.py ./proxy-list-with-redundant ./proxy-list-deleted-unsort
           [ ! -f "direct-list-deleted-unsort" ] && touch direct-list-deleted-unsort
           [ ! -f "proxy-list-deleted-unsort" ] && touch proxy-list-deleted-unsort
           sort ./direct-list-deleted-unsort > ./direct-list-deleted-sort
           sort ./proxy-list-deleted-unsort > ./proxy-list-deleted-sort
-          python ./resouces/removeFrom.py -remove ./direct-list-deleted-sort -from ./direct-list-with-redundant -out direct-list-without-redundant
-          python ./resouces/removeFrom.py -remove ./proxy-list-deleted-sort -from ./proxy-list-with-redundant -out proxy-list-without-redundant
+          python ./resources/removeFrom.py -remove ./direct-list-deleted-sort -from ./direct-list-with-redundant -out direct-list-without-redundant
+          python ./resources/removeFrom.py -remove ./proxy-list-deleted-sort -from ./proxy-list-with-redundant -out proxy-list-without-redundant
 
-      - name: Remove domains from "need-to-remove" lists in "resouces" folder
+      - name: Remove domains from "need-to-remove" lists in "resources" folder
         run: |
-          python ./resouces/removeFrom.py -remove ./resouces/direct-need-to-remove.txt -from ./direct-list-without-redundant -out ./temp-cn.txt
-          python ./resouces/removeFrom.py -remove ./resouces/proxy-need-to-remove.txt -from ./proxy-list-without-redundant -out ./temp-geolocation-\!cn.txt
+          python ./resources/removeFrom.py -remove ./resources/direct-need-to-remove.txt -from ./direct-list-without-redundant -out ./temp-cn.txt
+          python ./resources/removeFrom.py -remove ./resources/proxy-need-to-remove.txt -from ./proxy-list-without-redundant -out ./temp-geolocation-\!cn.txt
 
       - name: Write lists to data directory
         run: |
@@ -145,8 +145,8 @@ jobs:
           cat "temp-cn.txt"
           echo "::endgroup::"
 
-          echo "::group::temp-geolocation-\!cn.txt"
-          cat "temp-geolocation-\!cn.txt"
+          echo "::group::temp-geolocation-!cn.txt"
+          cat "temp-geolocation-!cn.txt"
           echo "::endgroup::"
 
       # - name: Add `full`, `regexp` and `keyword` type of rules back into "cn", and "geolocation-!cn" list
@@ -228,38 +228,25 @@ jobs:
             echo "::endgroup::"
           done
 
-      - name: Build temp geosite.dat
+      - name: Build geosite.dat @all
         run: |
           cd community || exit 1
-          mkdir -p ./temp
-          go run ./ --datapath=./data --outputdir=./temp --exportlists=_all_ --outputname=temp-geosite.dat
+          mkdir -p ./all
+          go run ./ --datapath=./data --outputdir=./all --exportlists=_all_ --outputname=geosite-all.dat
 
       - name: List exported lists
         run: |
           cd community || exit 1
-          for file in $(find ./temp -type f -name '*.txt' | sort); do
+          for file in $(find ./all -type f -name '*.txt' | sort); do
             echo "::group::${file}"
             cat "${file}"
             echo "::endgroup::"
           done
 
-      - name: Convert geosite to metadata
-        run: |
-          wget https://github.com/MetaCubeX/geo/releases/latest/download/geo-linux-amd64 -O geo
-          chmod +x geo
-          mkdir -p unpacksite
-          ./geo unpack site -d unpacksite ./community/temp/temp-geosite.dat
-          mkdir -p community/geodata
-          code=(apple applemusic bilibili biliintl cn ehentai geolocation-\!cn github googlefcm google line microsoft misskey netease onedrive pixiv private sharepoint steam telegram twitter win-update youtube)
-          for((i=0;i<${#code[@]};i++));do
-            cp ./unpacksite/${code[i]} ./community/geodata/${code[i]}
-            sed -i 's/regex:/regexp:/g; s/plain:/keyword:/g' ./community/geodata/${code[i]}
-          done
-
-      - name: Build geosite.dat file
+      - name: Build geosite.dat
         run: |
           cd community || exit 1
-          go run ./ --datapath=./geodata --outputdir=./ --exportlists= --outputname=geosite.dat
+          go run ./ --datapath=./data --outputdir=./ --datprofile=../resources/geosite.json --exportlists= --outputname=geosite.dat
 
       - name: Move files
         run: |
