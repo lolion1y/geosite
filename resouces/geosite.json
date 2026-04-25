@@ -1,0 +1,32 @@
+// https://github.com/v2fly/domain-list-community/discussions/3370
+[
+	{
+		"name": "geosite.dat",
+		"mode": "allowlist",
+		"lists": [
+			"apple",
+			"applemusic",
+			"bilibili",
+			"biliintl",
+			"cn",
+			"ehentai",
+			"geolocation-!cn",
+			"github",
+			"googlefcm",
+			"google",
+			"line",
+			"microsoft",
+			"misskey",
+			"netease",
+			"onedrive",
+			"pixiv",
+			"private",
+			"sharepoint",
+			"steam",
+			"telegram",
+			"twitter",
+			"win-update",
+			"youtube",
+		]
+	}
+]
