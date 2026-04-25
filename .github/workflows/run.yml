@@ -63,7 +63,11 @@ jobs:
         run: |
           # curl -sSL ${CHINA_DOMAINS_URL} | sed '/^\s*#/d' | sed '/^[^\.]/ s/^/full:/' |  sed 's/^\.\([^.]*\)/\1/' > temp-direct.txt
           # curl -sSL ${CUSTOM_DIRECT} | perl -ne '/^(domain):([^:]+)(\n$|:@.+)/ && print "$2\n"' >> temp-direct.txt
-          cat ./community/data/cn | tee -a temp-direct.txt
+          cat ./community/data/cn >> temp-direct.txt
+
+          echo "::group::temp-direct.txt"
+          cat "temp-direct.txt"
+          echo "::endgroup::"
 
       - name: Get and add proxy domains into temp-proxy.txt file
         run: |
@@ -71,7 +75,11 @@ jobs:
           # curl -sSL $GOOGLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' >> temp-proxy.txt
           # curl -sSL $APPLE_DOMAINS_URL | perl -ne '/^server=\/([^\/]+)\// && print "$1\n"' >> temp-proxy.txt
           # curl -sSL ${CUSTOM_PROXY} | grep -Ev ":@cn" | perl -ne '/^(domain):([^:]+)(\n$|:@.+)/ && print "$2\n"' >> temp-proxy.txt
-          cat ./community/data/geolocation-\!cn | tee -a temp-proxy.txt
+          cat ./community/data/geolocation-\!cn >> temp-proxy.txt
+
+          echo "::group::temp-proxy.txt"
+          cat "temp-proxy.txt"
+          echo "::endgroup::"
 
       # - name: Reserve `full`, `regexp` and `keyword` type of rules from custom lists to "reserve" files
         # run: |
@@ -80,15 +88,31 @@ jobs:
 
       - name: Add proxy, direct and reject domains from "hidden" branch to appropriate temp files
         run: |
-          cat ./resouces/proxy.txt | tee -a temp-proxy.txt
-          cat ./resouces/direct.txt | tee -a temp-direct.txt
+          cat ./resouces/proxy.txt >> temp-proxy.txt
+          cat ./resouces/direct.txt >> temp-direct.txt
           # cat reject.txt >> temp-reject.txt
+
+          echo "::group::temp-direct.txt"
+          cat "temp-direct.txt"
+          echo "::endgroup::"
+
+          echo "::group::temp-proxy.txt"
+          cat "temp-proxy.txt"
+          echo "::endgroup::"
 
       - name: Sort and generate redundant lists
         run: |
-          cat temp-proxy.txt | sort --ignore-case -u | tee proxy-list-with-redundant
-          cat temp-direct.txt | sort --ignore-case -u | tee direct-list-with-redundant
+          cat temp-proxy.txt | sort --ignore-case -u > proxy-list-with-redundant
+          cat temp-direct.txt | sort --ignore-case -u > direct-list-with-redundant
           # cat temp-reject.txt | sort --ignore-case -u > reject-list-with-redundant
+
+          echo "::group::direct-list-with-redundant"
+          cat "direct-list-with-redundant"
+          echo "::endgroup::"
+
+          echo "::group::proxy-list-with-redundant"
+          cat "proxy-list-with-redundant"
+          echo "::endgroup::"
 
       - name: Remove redundant domains
         run: |
@@ -114,8 +138,16 @@ jobs:
           # cat temp-geolocation-\!cn.txt | sort --ignore-case -u | perl -ne '/^((?=^.{1,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})*)/ && print "$1\n"' | perl -ne 'print if not /\.cn$/' > ./community/data/geolocation-\!cn
           # cat temp-geolocation-\!cn.txt | sort --ignore-case -u | perl -ne 'print if not /^((?=^.{3,255})[a-zA-Z0-9][-_a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-_a-zA-Z0-9]{0,62})+)/' > proxy-tld-list.txt
 
-          cat temp-cn.txt | sort --ignore-case -u | tee ./community/data/cn
-          cat temp-geolocation-\!cn.txt | sort --ignore-case -u | tee ./community/data/geolocation-\!cn
+          cat temp-cn.txt | sort --ignore-case -u > ./community/data/cn
+          cat temp-geolocation-\!cn.txt | sort --ignore-case -u > ./community/data/geolocation-\!cn
+
+          echo "::group::temp-cn.txt"
+          cat "temp-cn.txt"
+          echo "::endgroup::"
+
+          echo "::group::temp-geolocation-\!cn.txt"
+          cat "temp-geolocation-\!cn.txt"
+          echo "::endgroup::"
 
       # - name: Add `full`, `regexp` and `keyword` type of rules back into "cn", and "geolocation-!cn" list
         # run: |
