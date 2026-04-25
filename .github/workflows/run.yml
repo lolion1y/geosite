@@ -50,8 +50,8 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version-file: ./custom/go.mod
-          cache-dependency-path: ./custom/go.sum
+          go-version-file: community/go.mod
+          cache-dependency-path: community/go.sum
 
       # - name: Generate GFWList domains
         # run: |
@@ -194,8 +194,8 @@ jobs:
 
       - name: Build temp geosite.dat
         run: |
-          cd custom || exit 1
-          go run ./ --datapath=../community/data --outputpath=./ --excludeattrs= --togfwlist= --exportlists=cn --datname=temp-geosite.dat
+          cd community || exit 1
+          go run ./ --datapath=./data --outputdir=./ --exportlists=cn --outputname=temp-geosite.dat
 
           cat cn.txt
 
@@ -205,13 +205,7 @@ jobs:
           wget https://github.com/MetaCubeX/geo/releases/latest/download/geo-linux-amd64 -O geo
           chmod +x geo
           mkdir unpacksite
-          ./geo unpack site -d unpacksite ../custom/temp-geosite.dat
-
-      - name: Setup Go
-        uses: actions/setup-go@v6
-        with:
-          go-version-file: community/go.mod
-          cache-dependency-path: community/go.sum
+          ./geo unpack site -d unpacksite ../community/temp-geosite.dat
 
       - name: Build geosite.dat file
         run: |
