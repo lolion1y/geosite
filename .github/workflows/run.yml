@@ -11,6 +11,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Set variables
         run: |
@@ -26,7 +28,7 @@ jobs:
           echo "WIN_EXTRA=https://raw.githubusercontent.com/crazy-max/WindowsSpyBlocker/master/data/hosts/extra.txt" >> $GITHUB_ENV
         shell: bash
 
-      - name: Checkout
+      - name: Checkout the current repo
         uses: actions/checkout@v6
 
       # - name: Checkout Loyalsoldier/domain-list-custom
@@ -258,12 +260,12 @@ jobs:
           mkdir -p ./publish/
           install -Dp ./community/geosite.dat ./publish/
 
-      - name: Delete current release assets
-        uses: andreaswilli/delete-release-assets-action@v4.0.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: latest
-          deleteOnlyFromDrafts: false
+      - name: Delete release if exist then create release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete latest --cleanup-tag -y || true
+          gh release create latest --title "Release ${{ env.BUILDTIME }}" ./publish/*
 
       - name: Git push assets to "release" branch
         run: |
@@ -276,17 +278,6 @@ jobs:
           git commit -m release
           git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
           git push -f -u origin release
-
-      - name: Upload files to GitHub release
-        id: upload_release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          release_name: ${{ env.BUILDTIME }}
-          tag: latest
-          file_glob: true
-          overwrite: true
-          file: ./publish/*
 
       - name: Purge jsdelivr CDN
         run: |
