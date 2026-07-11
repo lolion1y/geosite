@@ -197,6 +197,7 @@ jobs:
           echo global.market.xiaomi.com >> ./community/data/geolocation-\!cn
           echo c.mi.com >> ./community/data/geolocation-\!cn
           echo xn--ngstr-cn-8za9o.com >> ./community/data/google
+          echo kuiniuca.com >> ./community/data/cn
           echo "include:geolocation-!cn @cn" >> ./community/data/cn
           # echo "include:geolocation-cn @!cn" >> ./community/data/geolocation-\!cn
 
