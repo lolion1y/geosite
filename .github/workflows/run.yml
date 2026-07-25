@@ -201,6 +201,14 @@ jobs:
           echo "include:geolocation-!cn @cn" >> ./community/data/cn
           # echo "include:geolocation-cn @!cn" >> ./community/data/geolocation-\!cn
 
+          echo "domain:a.neneai.net @cn" >> ./community/data/nene
+          echo "domain:cyrene.cloud" >> ./community/data/nene
+          echo "domain:neneai.net" >> ./community/data/nene
+          echo "domain:neneol.org @cn" >> ./community/data/nene
+          echo "domain:neurl.de" >> ./community/data/nene
+          echo "domain:nlo.li" >> ./community/data/nene
+          echo "full:d.nlo.li @cn" >> ./community/data/nene
+
           echo "auvpn.net" >> ./community/data/category-vpnservices
           echo "ausososo.click @cn" >> ./community/data/category-vpnservices
           echo "ausososo.club @cn" >> ./community/data/category-vpnservices
