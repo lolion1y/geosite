@@ -199,6 +199,7 @@ jobs:
           echo xn--ngstr-cn-8za9o.com >> ./community/data/google
           echo kuiniuca.com >> ./community/data/cn
           echo "include:geolocation-!cn @cn" >> ./community/data/cn
+          echo "include:taptap @!cn" >> ./community/data/geolocation-\!cn
           # echo "include:geolocation-cn @!cn" >> ./community/data/geolocation-\!cn
 
           echo "domain:a.neneai.net @cn" >> ./community/data/nene
