@@ -201,6 +201,8 @@ jobs:
           echo "include:geolocation-!cn @cn" >> ./community/data/cn
           echo "include:taptap @!cn" >> ./community/data/geolocation-\!cn
           # echo "include:geolocation-cn @!cn" >> ./community/data/geolocation-\!cn
+          echo "webpay.xd.com @!cn" >> ./community/data/xd
+          echo "include:xd @!cn" >> ./community/data/geolocation-\!cn
 
           echo "domain:a.neneai.net @cn" >> ./community/data/nene
           echo "domain:cyrene.cloud" >> ./community/data/nene
